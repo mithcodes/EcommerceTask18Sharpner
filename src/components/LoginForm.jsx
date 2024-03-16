@@ -10,7 +10,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { login } = AuthCxt();
+  const { login, setuser, token } = AuthCxt();
   const navigate = useNavigate();
 
   const switchAuthModeHandler = () => {
@@ -41,7 +41,7 @@ const LoginForm = () => {
         console.log(data);
         if (data.error) return alert(data.error.message);
         else {
-          alert("You have successfully logged in!");
+          setuser(email);
           login(data);
           navigate("/store");
         }
@@ -63,7 +63,7 @@ const LoginForm = () => {
         );
         setISLoding(false);
         let data = await response.json();
-
+        setuser(email);
         setEmail("");
         setPassword("");
 

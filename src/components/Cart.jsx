@@ -1,17 +1,38 @@
 import React from 'react';
+import { useEffect, useState } from "react";
+import AuthCxt from "../context/AuthContext";
 import { AppState } from '../context/Context'; // Import AppState from Context.jsx
 
 const Cart = ({ cart }) => {
+  const [cartElements, setCart] = useState([]);
+  const { user } = AuthCxt();
   const { state } = AppState();
-  const cartElements = state.cart;
+ 
+  const cartItem = async (email) => {
+    let cleanEmail = removeSpecialCharacters(email);
+    let userdata = await fetch(
+      `https://crudcrud.com/api/426bbbbc3490407db55ce9c3e95d1267/${cleanEmail}`
+    );
+    userdata = await userdata.json();
+    let setdata = () => {
+      setCart(userdata);
+      state.cart = userdata;
+    };
+    setdata();
+  };
 
-  let total = cartElements.reduce((sum, e) => {
-    return sum + e.quantity * e.price;
-  }, 0);
+  function removeSpecialCharacters(text) {
+    const cleanedText = text.replace(/[.@]/g, "");
+    return cleanedText;
+  }
+  console.log(cartElements);
 
   function handleClick() {
     cart((prev) => !prev);
   }
+  useEffect(() => {
+    cartItem(user);
+  }, []);
 
   return (
     <div className="cart">
@@ -31,7 +52,12 @@ const Cart = ({ cart }) => {
       ))}
       <div className="cart_Item total">
         <h4>Total</h4>
-        <h4>${total}</h4>
+        <h4>
+          $
+          {cartElements.reduce((sum, e) => {
+            return sum + e.quantity * e.price;
+          }, 0)}
+        </h4>
         <div>
           <button>Purchase</button>
         </div>
